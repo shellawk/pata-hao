@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,5 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
 
 Route::post('/enquiries/{id}/close', [EnquiryController::class, 'close'])
     ->middleware('auth:sanctum');
+
+Route::post('/login', [AuthController::class, 'login']);
