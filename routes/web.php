@@ -2,9 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Property;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('Home', [
+        'properties' => Property::all()
+    ]);
 })->name('home');
 
 Route::middleware(['auth'])->group(function () {
