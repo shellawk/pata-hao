@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react";
 
 export default function Navbar() {
   return (
-    <header className="bg-[#0a3d62] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+    <header className="bg-[#0a3d62] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50" style={{color: "white"}}>
       <h2 className="font-bold text-lg">PataHao</h2>
 
       <div className="flex gap-3">

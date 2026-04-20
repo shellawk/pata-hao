@@ -44,31 +44,96 @@ class DatabaseSeeder extends Seeder
         // PROPERTIES
         // =====================
 
-        $p1 = Property::create([
-            'type' => 'Apartment',
-            'price' => 50000,
-            'location' => 'Nairobi',
-            'size' => 900,
-            'beds' => 2,
-            'baths' => 1,
-            'description' => 'Nice apartment in Nairobi',
-            'images' => ['apartment1.jpg','apartment2.jpg'],
-            'phone' => $agent->phone,
-            'user_id' => $agent->id
-        ]);
+        $properties = [
+            [
+                'type' => 'Apartment',
+                'price' => 50000,
+                'location' => 'Nairobi',
+                'size' => 900,
+                'beds' => 2,
+                'baths' => 1,
+                'description' => 'Nice apartment in Nairobi',
+                'images' => ['apartment1.jpg','apartment2.jpg'],
+            ],
+            [
+                'type' => 'House',
+                'price' => 120000,
+                'location' => 'Karen',
+                'size' => 2500,
+                'beds' => 4,
+                'baths' => 3,
+                'description' => 'Luxury house in Karen',
+                'images' => ['house1.jpg','house2.jpg'],
+            ],
+            [
+                'type' => 'Apartment',
+                'price' => 65000,
+                'location' => 'Westlands',
+                'size' => 1100,
+                'beds' => 3,
+                'baths' => 2,
+                'description' => 'Modern apartment',
+                'images' => ['apartment1.jpg','apartment2.jpg'],
+            ],
+            [
+                'type' => 'Apartment',
+                'price' => 40000,
+                'location' => 'Kilimani',
+                'size' => 800,
+                'beds' => 2,
+                'baths' => 1,
+                'description' => 'Affordable apartment',
+                'images' => ['apartment1.jpg','apartment2.jpg'],
+            ],
+            [
+                'type' => 'Apartment',
+                'price' => 75000,
+                'location' => 'Lavington',
+                'size' => 1300,
+                'beds' => 3,
+                'baths' => 2,
+                'description' => 'Spacious apartment',
+                'images' => ['apartment1.jpg','apartment2.jpg'],
+            ],
+            [
+                'type' => 'House',
+                'price' => 150000,
+                'location' => 'Runda',
+                'size' => 3000,
+                'beds' => 5,
+                'baths' => 4,
+                'description' => 'Luxury house',
+                'images' => ['house1.jpg','house2.jpg'],
+            ],
+            [
+                'type' => 'House',
+                'price' => 90000,
+                'location' => 'Ngong',
+                'size' => 2000,
+                'beds' => 3,
+                'baths' => 2,
+                'description' => 'Family house',
+                'images' => ['house1.jpg','house2.jpg'],
+            ],
+            [
+                'type' => 'House',
+                'price' => 110000,
+                'location' => 'Syokimau',
+                'size' => 2200,
+                'beds' => 4,
+                'baths' => 3,
+                'description' => 'Modern house',
+                'images' => ['house1.jpg','house2.jpg'],
+            ],
+        ];
 
-        $p2 = Property::create([
-            'type' => 'House',
-            'price' => 120000,
-            'location' => 'Karen',
-            'size' => 2500,
-            'beds' => 4,
-            'baths' => 3,
-            'description' => 'Luxury house in Karen',
-            'images' => ['house1.jpg','house2.jpg'],
-            'phone' => $agent->phone,
-            'user_id' => $agent->id
-        ]);
+        foreach ($properties as $p) {
+            Property::create([
+                ...$p,
+                'phone' => $agent->phone,
+                'user_id' => $agent->id,
+            ]);
+        }
 
         // =====================
         // ENQUIRIES
@@ -76,7 +141,7 @@ class DatabaseSeeder extends Seeder
 
         Enquiry::create([
             'user_id' => $user->id,
-            'property_id' => $p1->id,
+            'property_id' => Property::first()->id,
             'type' => 'Apartment',
             'location' => 'Nairobi',
             'beds' => 2,

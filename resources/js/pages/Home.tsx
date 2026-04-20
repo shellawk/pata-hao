@@ -96,7 +96,7 @@ export default function Home({ properties }: { properties: Property[] }) {
               }
               value={filters.type}
             >
-              <option value="">Type</option>
+              <option value="">All</option>
               <option value="Apartment">Apartment</option>
               <option value="House">House</option>
             </select>
@@ -169,6 +169,7 @@ export default function Home({ properties }: { properties: Property[] }) {
           <button
             onClick={handleFilter}
             className="mt-3 bg-[#0a3d62] text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
+            style={{color: "white"}}
           >
             Search
           </button>
