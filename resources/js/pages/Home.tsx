@@ -205,34 +205,32 @@ export default function Home({ properties }: { properties: Property[] }) {
       </div>
       {selected && (
         <div
-          className="fixed inset-0 bg-black/60 flex items-start justify-center p-4 z-50"
-          onClick={() => setSelected(null)}
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-start justify-center z-50 p-3 pt-[80px]"
+          onClick={() => setSelected(null)} style ={{backgroundColor: "rgba(0, 0, 0, 0.7)"}}
         >
           <div
-            className="bg-white w-full max-w-3xl rounded-xl p-4 max-h-[90vh] overflow-y-auto"
+            className="bg-white w-full max-w-2xl rounded-xl shadow-xl overflow-hidden max-h-[85vh] overflow-y-auto opacity-100"
             onClick={(e) => e.stopPropagation()}
+            style={{backgroundColor: "white"}}
           >
-            {/* CLOSE */}
-            <button
-              className="float-right bg-red-500 text-white px-2 py-1 rounded"
-              onClick={() => setSelected(null)}
-            >
-              X
-            </button>
+            {/* CLOSE BUTTON */}
+            <div className="sticky top-0 bg-white p-3 flex justify-end">
+              <button
+                onClick={() => setSelected(null)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                X
+              </button>
+            </div>
 
-            {/* TITLE */}
-            <h2 className="text-xl font-bold mb-2">
-              {selected.type} - {selected.location}
-            </h2>
-
-            {/* MAIN IMAGE */}
+            {/* IMAGE */}
             <img
               src={activeImage || selected.images?.[0]}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full h-64 object-cover"
             />
 
             {/* GALLERY */}
-            <div className="flex gap-2 mt-2 flex-wrap">
+            <div className="flex gap-2 p-3 flex-wrap">
               {selected.images?.map((img, i) => (
                 <img
                   key={i}
@@ -245,23 +243,25 @@ export default function Home({ properties }: { properties: Property[] }) {
               ))}
             </div>
 
-            {/* INFO */}
-            <div className="mt-3 space-y-1">
+            {/* DETAILS */}
+            <div className="p-4 space-y-2">
+              <h2 className="text-lg font-bold">
+                {selected.type} - {selected.location}
+              </h2>
+
               <p className="text-green-600 font-bold text-lg">
                 KES {selected.price}
               </p>
 
-              <p>
+              <p className="text-sm text-gray-500">
                 {selected.size} sq ft • {selected.beds} beds • {selected.baths} baths
               </p>
 
-              <p className="text-gray-600">{selected.location}</p>
+              <p className="text-gray-600">{selected.description}</p>
 
-              <p className="mt-2">{selected.description}</p>
-
-              <p className="mt-3 font-semibold">
-                Agent: {selected.phone}
-              </p>
+              <div className="pt-2 border-t text-sm">
+                <span className="font-semibold">Agent:</span> {selected.phone}
+              </div>
             </div>
           </div>
         </div>
