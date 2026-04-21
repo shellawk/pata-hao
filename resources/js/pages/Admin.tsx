@@ -60,32 +60,32 @@ export default function Admin() {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="font-semibold mb-3">All Enquiries</h2>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {enquiries.map((e: any) => (
-              <div key={e.id} className="bg-white p-4 rounded shadow border">
+              <div key={e.id} className="border p-3 rounded">
 
-                <div className="flex justify-between">
-                  <h3 className="font-semibold">
-                    {e.type} • {e.location}
-                  </h3>
+                <div className="font-semibold">
+                  {e.type} • {e.location}
                 </div>
 
-                <div className="mt-2 text-sm space-y-1 text-gray-700">
+                <div className="text-sm text-gray-500 mt-1">
+                  Budget: {e.min_price} - {e.max_price}
+                </div>
 
+                {/* ================= USER INFO ================= */}
+                <div className="mt-2 text-sm space-y-1">
                   <p>
                     <strong>Name:</strong> {e.user?.name}
                   </p>
 
+                  {/* Only show if you actually store phone on user */}
                   <p>
-                    <strong>Phone:</strong> {e.user?.phone ?? "N/A"}
+                    <strong>Phone:</strong> {e.user?.phone || "N/A"}
                   </p>
 
-                  <p className="text-gray-600">
-                    <strong>Budget:</strong> {e.min_price} - {e.max_price}
+                  <p>
+                    <strong>Email:</strong> {e.user?.email}
                   </p>
-
-                  {e.beds && <p>Beds: {e.beds}</p>}
-                  {e.baths && <p>Baths: {e.baths}</p>}
 
                   {e.message && (
                     <p className="text-gray-600">
@@ -93,6 +93,7 @@ export default function Admin() {
                     </p>
                   )}
                 </div>
+
               </div>
             ))}
           </div>
