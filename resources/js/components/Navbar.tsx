@@ -22,11 +22,10 @@ export default function Navbar() {
 
         {auth?.user ? (
           <>
-            <Link href="/profile" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
-              Profile
+            <Link href={route('profile.edit')} className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
+              {auth?.user?.name || 'Profile'}
             </Link>
 
-            {/* ✅ LOGOUT BUTTON */}
             <button
               onClick={logout}
               className="px-3 py-1 rounded bg-red-500 hover:bg-red-600"
