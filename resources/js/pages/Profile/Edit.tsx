@@ -4,8 +4,14 @@ import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfile
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
 import { Head, usePage } from '@inertiajs/react';
 
-export default function Edit({ mustVerifyEmail, status }) {
-    const { user } = usePage().props;
+type Props = {
+    mustVerifyEmail: boolean;
+    status: string | null;
+};
+
+export default function Edit({ mustVerifyEmail, status }: Props) {
+    const { auth } = usePage().props as any;
+    const user = auth.user;
 
     return (
         <AuthenticatedLayout
