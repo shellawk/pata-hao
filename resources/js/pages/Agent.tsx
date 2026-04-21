@@ -161,11 +161,37 @@ export default function Agent() {
           </form>
         </div>
 
+        
+
+        {/* ================= PROPERTIES ================= */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2 mt-6">
+            Available Properties
+          </h2>
+
+          <div className="max-h-96 overflow-y-auto pr-2 grid md:grid-cols-2 gap-3">
+            {properties.map((p: any) => (
+              <div key={p.id} className="bg-white p-4 rounded shadow border">
+                <h3 className="font-semibold">{p.type}</h3>
+                <p className="text-sm text-gray-600">{p.location}</p>
+                <p className="text-sm text-gray-600">{p.price}</p>
+
+                <button
+                  onClick={() => deleteProperty(p.id)}
+                  className="mt-2 text-xs px-2 py-1 bg-red-100 text-red-700 rounded"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* ================= ENQUIRIES ================= */}
         <div>
           <h2 className="text-lg font-semibold mb-2">Incoming Enquiries</h2>
 
-          <div className="space-y-3">
+          <div className="max-h-[28rem] overflow-y-auto space-y-3 pr-2">
             {enquiries.map((e: any) => (
               <div key={e.id} className="bg-white p-4 rounded shadow border">
 
@@ -198,30 +224,6 @@ export default function Agent() {
                     </p>
                   )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ================= PROPERTIES ================= */}
-        <div>
-          <h2 className="text-lg font-semibold mb-2 mt-6">
-            Available Properties
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-3">
-            {properties.map((p: any) => (
-              <div key={p.id} className="bg-white p-4 rounded shadow border">
-                <h3 className="font-semibold">{p.type}</h3>
-                <p className="text-sm text-gray-600">{p.location}</p>
-                <p className="text-sm text-gray-600">{p.price}</p>
-
-                <button
-                  onClick={() => deleteProperty(p.id)}
-                  className="mt-2 text-xs px-2 py-1 bg-red-100 text-red-700 rounded"
-                >
-                  Delete
-                </button>
               </div>
             ))}
           </div>

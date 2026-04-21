@@ -22,7 +22,7 @@ export default function Admin() {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="font-semibold mb-3">Users</h2>
 
-          <div className="space-y-2">
+          <div className="max-h-64 overflow-y-auto space-y-2 pr-2">
             {users.map((u: any) => (
               <div key={u.id} className="border p-2 rounded flex justify-between">
                 <div>
@@ -38,7 +38,7 @@ export default function Admin() {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="font-semibold mb-3">All Properties</h2>
 
-          <div className="grid md:grid-cols-2 gap-3">
+          <div className="max-h-96 overflow-y-auto pr-2 grid md:grid-cols-2 gap-3">
             {properties.map((p: any) => (
               <div key={p.id} className="border p-3 rounded">
                 <h3 className="font-semibold">{p.type}</h3>
@@ -60,7 +60,7 @@ export default function Admin() {
         <div className="bg-white p-4 rounded shadow">
           <h2 className="font-semibold mb-3">All Enquiries</h2>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[28rem] overflow-y-auto space-y-3 pr-2">
             {enquiries.map((e: any) => (
               <div key={e.id} className="border p-3 rounded">
 

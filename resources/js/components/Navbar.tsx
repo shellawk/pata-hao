@@ -10,16 +10,23 @@ export default function Navbar() {
 
   return (
     <header className="bg-[#0a3d62] text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50">
-      <h2 className="font-bold text-lg">PataHao</h2>
+      <Link href={route("home")} className="font-bold text-lg hover:opacity-80">
+        PataHao
+      </Link>
 
       <div className="flex gap-3 items-center">
         <Link href="/" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
           Browse
         </Link>
 
-        <Link href="/enquiries" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
-          Enquiries
-        </Link>
+        {user?.role !== "admin" && (
+          <Link
+            href="/enquiries"
+            className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+          >
+            Enquiries
+          </Link>
+        )}
 
         {/* AGENT */}
         {user?.role === "agent" && (
