@@ -30,24 +30,28 @@ class RegisteredUserController extends Controller
      * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:users,email',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:user,agent',
-        ]);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->input('role'),
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|lowercase|email|max:255|unique:users,email',
+        'phone' => 'required|string|max:20',
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'role' => 'required|in:user,agent',
+    ]);
 
-        event(new Registered($user));
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role,
+    ]);
 
-        Auth::login($user);
+    event(new Registered($user));
 
-        return redirect(route('dashboard', absolute: false));
-    }
+    Auth::login($user);
+
+    return $user->role === 'agent'
+        ? redirect('/agent')
+        : redirect('/');
+}
 }
