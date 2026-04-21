@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Enquiry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EnquiryController extends Controller
 {
@@ -41,5 +42,30 @@ class EnquiryController extends Controller
         ]);
 
         return redirect()->route('enquiries');
+    }
+
+    public function toggleStatus(Enquiry $enquiry)
+    {
+        $this->authorizeOwner($enquiry);
+
+        $enquiry->update([
+            'status' => $enquiry->status === 'open' ? 'closed' : 'open',
+        ]);
+
+        return back();
+    }
+
+    public function destroy(Enquiry $enquiry)
+    {
+        $this->authorizeOwner($enquiry);
+
+        $enquiry->delete();
+
+        return back();
+    }
+
+    private function authorizeOwner(Enquiry $enquiry)
+    {
+        abort_if($enquiry->user_id !== auth()->id(), 403);
     }
 }

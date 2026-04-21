@@ -144,6 +144,8 @@ class DatabaseSeeder extends Seeder
             'property_id' => Property::first()->id,
             'type' => 'Apartment',
             'location' => 'Nairobi',
+            'min_price' => 40000,
+            'max_price' => 60000,
             'beds' => 2,
             'baths' => 1,
             'message' => 'Is this property still available?',

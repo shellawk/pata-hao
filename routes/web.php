@@ -38,6 +38,10 @@ Route::get('/admin', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::post('/enquiries', [EnquiryController::class, 'store'])->name('enquiries.store');
+    Route::patch('/enquiries/{enquiry}', [EnquiryController::class, 'toggleStatus'])->name('enquiries.toggle');
+    Route::delete('/enquiries/{enquiry}', [EnquiryController::class, 'destroy'])->name('enquiries.destroy');
 });
 
 require __DIR__.'/auth.php';
