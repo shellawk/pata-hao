@@ -11,14 +11,22 @@ class Enquiry extends Model
         'property_id',
         'type',
         'location',
-        'size',
+
+        'min_size',
+        'max_size',
+
         'min_price',
         'max_price',
+
         'beds',
         'baths',
+
         'message',
         'status',
-        'closed_by',
-        'closed_at'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

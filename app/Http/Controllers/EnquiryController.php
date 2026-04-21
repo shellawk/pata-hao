@@ -7,45 +7,39 @@ use Illuminate\Http\Request;
 
 class EnquiryController extends Controller
 {
-    // GET /api/enquiries
-    public function index()
-    {
-        return Enquiry::latest()->get();
-    }
-
-    // POST /api/enquiries
     public function store(Request $request)
     {
-        if (!auth()->check()) {
-            return response()->json(['message' => 'Login required'], 401);
-        }
+        $request->validate([
+            'type' => 'required|in:Apartment,House',
+            'location' => 'required|string',
 
-        return Enquiry::create([
-            ...$request->all(),
+            'min_price' => 'nullable|numeric',
+            'max_price' => 'nullable|numeric',
+
+            'min_size' => 'nullable|numeric',
+            'max_size' => 'nullable|numeric',
+
+            'beds' => 'nullable|integer',
+            'baths' => 'nullable|integer',
+
+            'message' => 'nullable|string',
+        ]);
+
+        Enquiry::create([
             'user_id' => auth()->id(),
-            'status' => 'open'
-        ]);
-    }
+            'type' => $request->type,
+            'location' => $request->location,
+            'min_price' => $request->min_price,
+            'max_price' => $request->max_price,
+            'min_size' => $request->min_size,
+            'max_size' => $request->max_size,
+            'beds' => $request->beds,
+            'baths' => $request->baths,
+            'message' => $request->message,
 
-    // POST /api/enquiries/{id}/close
-    public function close($id)
-    {
-        $enquiry = Enquiry::findOrFail($id);
-
-        // Only owner or admin can close
-        if (
-            auth()->id() !== $enquiry->user_id &&
-            auth()->user()->role !== 'admin'
-        ) {
-            abort(403);
-        }
-
-        $enquiry->update([
-            'status' => 'closed',
-            'closed_by' => auth()->id(),
-            'closed_at' => now()
+            'status' => 'open',
         ]);
 
-        return $enquiry;
+        return redirect()->route('enquiries');
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EnquiryController;
+use App\Models\Enquiry;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -13,8 +15,17 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/enquiries', function () {
-    return Inertia::render('Enquiries');
+    return Inertia::render('Enquiries', [
+        'enquiries' => Enquiry::where('user_id', auth()->id())
+            ->latest()
+            ->get()
+    ]);
 })->middleware(['auth'])->name('enquiries');
+
+
+Route::post('/enquiries', [EnquiryController::class, 'store'])
+    ->middleware('auth')
+    ->name('enquiries.store');
 
 Route::get('/agent', function () {
     return Inertia::render('Agent');
