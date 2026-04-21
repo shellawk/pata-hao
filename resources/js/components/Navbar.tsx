@@ -2,6 +2,7 @@ import { Link, router, usePage } from "@inertiajs/react";
 
 export default function Navbar() {
   const auth = (usePage().props as any)?.auth;
+  const user = auth?.user;
 
   const logout = () => {
     router.post("/logout");
@@ -17,13 +18,26 @@ export default function Navbar() {
         </Link>
 
         <Link href="/enquiries" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
-          Enquiry
+          Enquiries
         </Link>
 
-        {auth?.user ? (
+        {/* ✅ AGENT LINK */}
+        {user?.role === "agent" && (
+          <Link
+            href={route("agent")}
+            className="px-3 py-1 rounded bg-green-500/80 hover:bg-green-500"
+          >
+            Agent Dashboard
+          </Link>
+        )}
+
+        {user ? (
           <>
-            <Link href={route('profile.edit')} className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
-              {auth?.user?.name || 'Profile'}
+            <Link
+              href={route("profile.edit")}
+              className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+            >
+              {user.name || "Profile"}
             </Link>
 
             <button
@@ -35,10 +49,16 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <Link href="/login" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
+            <Link
+              href="/login"
+              className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+            >
               Login
             </Link>
-            <Link href="/register" className="px-3 py-1 rounded bg-white/10 hover:bg-white/20">
+            <Link
+              href="/register"
+              className="px-3 py-1 rounded bg-white/10 hover:bg-white/20"
+            >
               Register
             </Link>
           </>
