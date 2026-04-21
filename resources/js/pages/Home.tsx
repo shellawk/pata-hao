@@ -199,7 +199,7 @@ export default function Home({ properties }: { properties: Property[] }) {
 
             {/* IMAGE */}
             <img
-              src={activeImage ? `/storage/${activeImage}` : `/storage/${selected.images?.[0]}`}
+              src={activeImage || selected.images?.[0]}
             />
 
             {/* GALLERY */}
@@ -207,7 +207,7 @@ export default function Home({ properties }: { properties: Property[] }) {
               {selected.images?.map((img, i) => (
                 <img
                   key={i}
-                  src={`/storage/${img}`}
+                  src={img}
                   onClick={() => setActiveImage(img)}
                   className={`w-20 h-16 object-cover rounded cursor-pointer border-2 ${
                     activeImage === img ? "border-[#0a3d62]" : "border-transparent"

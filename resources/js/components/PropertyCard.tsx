@@ -8,7 +8,9 @@ export default function PropertyCard({ property }: Props) {
   return (
     <div className="card">
       <img
-        src={property.images.length > 0 ? `/storage/${property.images[0]}` : "/placeholder.png"}
+        src={property.images.length > 0 
+          ? property.images[0] 
+          : "/placeholder.png"}
         style={{ width: "100%", borderRadius: "10px" }}
       />
 

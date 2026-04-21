@@ -25,14 +25,16 @@ class PropertyController extends Controller
             'baths' => 'nullable|integer',
             'phone' => 'nullable|string',
             'description' => 'nullable|string',
-            'images.*' => 'image|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $imagePaths = [];
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = $image->store('properties', 'public');
+                $path = $image->store('properties', 'public');
+                $imagePaths[] = '/storage/' . $path; // IMPORTANT FIX
             }
         }
 

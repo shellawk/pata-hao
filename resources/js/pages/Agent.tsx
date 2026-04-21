@@ -19,9 +19,25 @@ export default function Agent() {
     const createProperty = (e: any) => {
         e.preventDefault();
 
-        post(route("properties.store"), {
-            forceFormData: true, // IMPORTANT for file uploads
+        const formData = new FormData();
+
+        formData.append("type", data.type);
+        formData.append("location", data.location);
+        formData.append("price", data.price);
+        formData.append("size", data.size);
+        formData.append("beds", data.beds);
+        formData.append("baths", data.baths);
+        formData.append("phone", data.phone);
+        formData.append("description", data.description);
+
+        data.images.forEach((file, index) => {
+            formData.append(`images[${index}]`, file);
+        });
+
+        router.post(route("properties.store"), formData, {
+            preserveScroll: true,
             onSuccess: () => reset(),
+            onError: (err) => console.error(err),
         });
     };
 
@@ -117,10 +133,27 @@ export default function Agent() {
                 multiple
                 onChange={(e) => {
                     if (!e.target.files) return;
-                    setData("images", Array.from(e.target.files));
+
+                    const newFiles = Array.from(e.target.files);
+
+                    setData("images", [...data.images, ...newFiles]);
+
+                    e.target.value = "";
                 }}
                 className="w-full border p-2"
             />
+
+            {data.images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2">
+                {data.images.map((file, index) => (
+                <img
+                    key={index}
+                    src={URL.createObjectURL(file)}
+                    className="w-full h-20 object-cover rounded"
+                />
+                ))}
+            </div>
+            )}
 
             <button className="bg-blue-600 text-white px-4 py-2 rounded">
               Add Property
