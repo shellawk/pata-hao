@@ -21,13 +21,23 @@ export default function Navbar() {
           Enquiries
         </Link>
 
-        {/* ✅ AGENT LINK */}
+        {/* AGENT */}
         {user?.role === "agent" && (
           <Link
             href={route("agent")}
             className="px-3 py-1 rounded bg-green-500/80 hover:bg-green-500"
           >
             Agent Dashboard
+          </Link>
+        )}
+
+        {/* ADMIN */}
+        {user?.role === "admin" && (
+          <Link
+            href={route("admin")}
+            className="px-3 py-1 rounded bg-purple-500/80 hover:bg-purple-500"
+          >
+            Admin Dashboard
           </Link>
         )}
 

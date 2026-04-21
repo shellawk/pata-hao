@@ -29,13 +29,9 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
     ->middleware('auth')
     ->name('enquiries.store');
 
-Route::get('/agent', function () {
-    return Inertia::render('Agent');
-})->middleware(['auth'])->name('agent');
-
-Route::get('/admin', function () {
-    return Inertia::render('Admin');
-})->middleware(['auth'])->name('admin');
+// Route::get('/agent', function () {
+//     return Inertia::render('Agent');
+// })->middleware(['auth'])->name('agent');
 
 Route::get('/agent', function () {
     return Inertia::render('Agent', [
@@ -47,6 +43,15 @@ Route::get('/agent', function () {
 Route::post('/agent/assign', [AgentController::class, 'assign'])
     ->middleware('auth')
     ->name('agent.assign');
+
+
+Route::get('/admin', function () {
+    return Inertia::render('Admin', [
+        'users' => \App\Models\User::latest()->get(),
+        'properties' => Property::latest()->get(),
+        'enquiries' => Enquiry::latest()->get(),
+    ]);
+})->middleware(['auth'])->name('admin');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
