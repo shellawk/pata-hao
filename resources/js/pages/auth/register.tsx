@@ -15,7 +15,7 @@ export default function Register() {
         role: 'user',
     });
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('register'), {
