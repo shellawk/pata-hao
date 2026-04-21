@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import PropertyCard from "@/Components/PropertyCard";
+import Footer from "@/Components/Footer";
 
 interface Property {
   id: number;
@@ -239,6 +240,8 @@ export default function Home({ properties }: { properties: Property[] }) {
           </div>
         </div>
       )}
+
+      <Footer />
     </>
   );
 }

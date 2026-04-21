@@ -1,3 +1,4 @@
+import Footer from "@/Components/Footer";
 import Navbar from "@/Components/Navbar";
 import { useForm, usePage, router } from "@inertiajs/react";
 
@@ -230,6 +231,8 @@ export default function Agent() {
         </div>
 
       </div>
+
+      <Footer />
     </>
   );
 }

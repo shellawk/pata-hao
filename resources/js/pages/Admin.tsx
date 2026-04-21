@@ -1,3 +1,4 @@
+import Footer from "@/Components/Footer";
 import Navbar from "@/Components/Navbar";
 import { usePage, router } from "@inertiajs/react";
 
@@ -100,6 +101,8 @@ export default function Admin() {
         </div>
 
       </div>
+      
+      <Footer />
     </>
   );
 }
