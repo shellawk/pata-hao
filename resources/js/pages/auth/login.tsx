@@ -3,98 +3,93 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import AuthLayout from '@/Layouts/AuthLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import React from 'react';
 
-export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+type Props = {
+    status?: string;
+    canResetPassword?: boolean;
+};
+
+export default function Login({ status, canResetPassword }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: false,
     });
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        post(route('login'));
     };
 
     return (
-        <GuestLayout>
-            <Head title="Log in" />
+        <AuthLayout>
+            <Head title="Login" />
+
+            <h2 className="text-xl font-semibold mb-4">Welcome Back</h2>
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
+                <div className="mb-3 text-green-600 text-sm">{status}</div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-4">
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email">Email</InputLabel>
 
                     <TextInput
                         id="email"
                         type="email"
-                        name="email"
                         value={data.email}
                         className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setData('email', e.target.value)
+                        }
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div>
+                    <InputLabel htmlFor="password">Password</InputLabel>
 
                     <TextInput
                         id="password"
                         type="password"
-                        name="password"
                         value={data.password}
                         className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setData('password', e.target.value)
+                        }
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
+                <label className="flex items-center gap-2 text-sm">
+                    <Checkbox
+                        checked={data.remember}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setData('remember', e.target.checked)
+                        }
+                    />
+                    Remember me
+                </label>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
+                <PrimaryButton
+                    className="w-full bg-[#0a3d62] text-white"
+                    disabled={processing}
+                >
+                    Login
+                </PrimaryButton>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                <div className="text-center text-sm mt-2">
+                    <Link href={route('register')} className="text-[#0a3d62] underline">
+                        Create account
+                    </Link>
                 </div>
             </form>
-        </GuestLayout>
+        </AuthLayout>
     );
 }

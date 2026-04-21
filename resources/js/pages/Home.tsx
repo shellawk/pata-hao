@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
-import PropertyCard from "@/components/PropertyCard";
+import PropertyCard from "@/Components/PropertyCard";
 
 interface Property {
   id: number;
