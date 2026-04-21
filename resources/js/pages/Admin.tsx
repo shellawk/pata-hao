@@ -62,13 +62,36 @@ export default function Admin() {
 
           <div className="space-y-2">
             {enquiries.map((e: any) => (
-              <div key={e.id} className="border p-2 rounded">
-                <div className="font-semibold">
-                  {e.type} • {e.location}
+              <div key={e.id} className="bg-white p-4 rounded shadow border">
+
+                <div className="flex justify-between">
+                  <h3 className="font-semibold">
+                    {e.type} • {e.location}
+                  </h3>
                 </div>
 
-                <div className="text-sm text-gray-500">
-                  Budget: {e.min_price} - {e.max_price}
+                <div className="mt-2 text-sm space-y-1 text-gray-700">
+
+                  <p>
+                    <strong>Name:</strong> {e.user?.name}
+                  </p>
+
+                  <p>
+                    <strong>Phone:</strong> {e.user?.phone ?? "N/A"}
+                  </p>
+
+                  <p className="text-gray-600">
+                    <strong>Budget:</strong> {e.min_price} - {e.max_price}
+                  </p>
+
+                  {e.beds && <p>Beds: {e.beds}</p>}
+                  {e.baths && <p>Baths: {e.baths}</p>}
+
+                  {e.message && (
+                    <p className="text-gray-600">
+                      <strong>Message:</strong> {e.message}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}

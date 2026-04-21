@@ -191,15 +191,17 @@ export default function Enquiries() {
 
                 {/* DETAILS */}
                 <div className="text-sm text-gray-600 mt-2 space-y-1">
+                  <p><strong>Name:</strong> {enquiry.user?.name}</p>
+                  <p><strong>Phone:</strong> {enquiry.user?.phone}</p>
+
                   <p>
-                    Price: {enquiry.min_price} - {enquiry.max_price}
+                    <strong>Price:</strong> {enquiry.min_price} - {enquiry.max_price}
                   </p>
 
                   {enquiry.beds && <p>Beds: {enquiry.beds}</p>}
                   {enquiry.baths && <p>Baths: {enquiry.baths}</p>}
                   {enquiry.message && <p>Message: {enquiry.message}</p>}
                 </div>
-
               </div>
             ))}
           </div>

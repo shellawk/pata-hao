@@ -19,6 +19,7 @@ Route::get('/', function () {
 Route::get('/enquiries', function () {
     return Inertia::render('Enquiries', [
         'enquiries' => Enquiry::where('user_id', auth()->id())
+            ->with('user')
             ->latest()
             ->get()
     ]);
@@ -35,7 +36,7 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
 
 Route::get('/agent', function () {
     return Inertia::render('Agent', [
-        'enquiries' => Enquiry::latest()->get(),
+        'enquiries' => Enquiry::with('user')->latest()->get(),
         'properties' => Property::where('user_id', auth()->id())
             ->latest()
             ->get(),
@@ -51,7 +52,7 @@ Route::get('/admin', function () {
     return Inertia::render('Admin', [
         'users' => \App\Models\User::latest()->get(),
         'properties' => Property::latest()->get(),
-        'enquiries' => Enquiry::latest()->get(),
+        'enquiries' => Enquiry::with('user')->latest()->get(),
     ]);
 })->middleware(['auth'])->name('admin');
 

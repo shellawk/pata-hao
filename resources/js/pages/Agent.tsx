@@ -168,31 +168,35 @@ export default function Agent() {
           <div className="space-y-3">
             {enquiries.map((e: any) => (
               <div key={e.id} className="bg-white p-4 rounded shadow border">
+
                 <div className="flex justify-between">
                   <h3 className="font-semibold">
                     {e.type} • {e.location}
                   </h3>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-1">
-                  Budget: {e.min_price} - {e.max_price}
-                </p>
+                <div className="mt-2 text-sm space-y-1 text-gray-700">
 
-                {/* assign dropdown */}
-                <div className="mt-2">
-                  <select
-                    onChange={(ev) =>
-                      assignProperty(e.id, Number(ev.target.value))
-                    }
-                    className="border p-2 w-full"
-                  >
-                    <option>Select Property</option>
-                    {properties.map((p: any) => (
-                      <option key={p.id} value={p.id}>
-                        {p.type} - {p.location}
-                      </option>
-                    ))}
-                  </select>
+                  <p>
+                    <strong>Name:</strong> {e.user?.name}
+                  </p>
+
+                  <p>
+                    <strong>Phone:</strong> {e.user?.phone ?? "N/A"}
+                  </p>
+
+                  <p className="text-gray-600">
+                    <strong>Budget:</strong> {e.min_price} - {e.max_price}
+                  </p>
+
+                  {e.beds && <p>Beds: {e.beds}</p>}
+                  {e.baths && <p>Baths: {e.baths}</p>}
+
+                  {e.message && (
+                    <p className="text-gray-600">
+                      <strong>Message:</strong> {e.message}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
