@@ -36,7 +36,9 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
 Route::get('/agent', function () {
     return Inertia::render('Agent', [
         'enquiries' => Enquiry::latest()->get(),
-        'properties' => Property::latest()->get(),
+        'properties' => Property::where('user_id', auth()->id())
+            ->latest()
+            ->get(),
     ]);
 })->middleware(['auth'])->name('agent');
 
