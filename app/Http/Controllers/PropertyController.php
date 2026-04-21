@@ -16,23 +16,40 @@ class PropertyController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'type' => 'required|string',
-            'location' => 'required|string',
+        $request->validate([
+            'type' => 'required',
+            'location' => 'required',
             'price' => 'required|numeric',
-            'size' => 'required|integer',
+            'size' => 'required|numeric',
             'beds' => 'nullable|integer',
             'baths' => 'nullable|integer',
+            'phone' => 'nullable|string',
             'description' => 'nullable|string',
-            'phone' => 'nullable|string', // ✅ IMPORTANT
+            'images.*' => 'image|max:2048',
         ]);
+
+        $imagePaths = [];
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('properties', 'public');
+            }
+        }
 
         Property::create([
-            ...$validated,
-            'user_id' => auth()->id(),
-        ]);
+        'type' => $request->type,
+        'location' => $request->location,
+        'price' => $request->price,
+        'size' => $request->size,
+        'beds' => $request->beds,
+        'baths' => $request->baths,
+        'phone' => $request->phone,
+        'description' => $request->description,
+        'images' => $imagePaths,
+        'user_id' => auth()->id(),
+    ]);
 
-        return back();
+    return back();
     }
 
     public function destroy(Property $property)

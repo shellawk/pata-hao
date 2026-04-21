@@ -13,15 +13,17 @@ export default function Agent() {
     baths: "",
     description: "",
     phone: "",
+    images: [] as File[],
   });
 
-  const createProperty = (e: any) => {
-    e.preventDefault();
+    const createProperty = (e: any) => {
+        e.preventDefault();
 
-    post(route("properties.store"), {
-      onSuccess: () => reset(),
-    });
-  };
+        post(route("properties.store"), {
+            forceFormData: true, // IMPORTANT for file uploads
+            onSuccess: () => reset(),
+        });
+    };
 
   const deleteProperty = (id: number) => {
     if (confirm("Delete this property?")) {
@@ -108,6 +110,16 @@ export default function Agent() {
               value={data.description}
               onChange={(e) => setData("description", e.target.value)}
               className="w-full border p-2"
+            />
+
+            <input
+                type="file"
+                multiple
+                onChange={(e) => {
+                    if (!e.target.files) return;
+                    setData("images", Array.from(e.target.files));
+                }}
+                className="w-full border p-2"
             />
 
             <button className="bg-blue-600 text-white px-4 py-2 rounded">
