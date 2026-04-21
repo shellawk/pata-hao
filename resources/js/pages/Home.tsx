@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Head } from "@inertiajs/react";
-import axios from "axios";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/Components/Navbar";
 import PropertyCard from "@/Components/PropertyCard";
 
 interface Property {
@@ -58,19 +57,6 @@ export default function Home({ properties }: { properties: Property[] }) {
     });
 
     setFiltered(result);
-  };
-
-  const sendEnquiry = async () => {
-    try {
-      await axios.post("/api/enquiries", {
-        ...filters,
-        message: "Interested in property",
-      });
-
-      alert("Enquiry sent!");
-    } catch {
-      alert("Login required");
-    }
   };
 
   const [selected, setSelected] = useState<Property | null>(null);
@@ -189,18 +175,6 @@ export default function Home({ properties }: { properties: Property[] }) {
               <PropertyCard property={p} />
             </div>
           ))}
-        </div>
-
-        {/* ENQUIRY SECTION */}
-        <div className="bg-white p-4 rounded-xl shadow mt-6">
-          <h3 className="font-semibold mb-2">General Enquiry</h3>
-
-          <button
-            onClick={sendEnquiry}
-            className="bg-green-600 text-white px-4 py-2 rounded"
-          >
-            Send Enquiry
-          </button>
         </div>
       </div>
       {selected && (
