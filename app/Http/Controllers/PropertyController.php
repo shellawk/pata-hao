@@ -63,6 +63,14 @@ class PropertyController extends Controller
             403
         );
 
+         // Delete images
+        // if ($property->images) {
+        //     foreach ($property->images as $img) {
+        //         $path = str_replace('/storage/', '', $img);
+        //         Storage::disk('public')->delete($path);
+        //     }
+        // }
+
         $property->delete();
 
         return back();
