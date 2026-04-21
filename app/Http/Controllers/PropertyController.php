@@ -56,7 +56,12 @@ class PropertyController extends Controller
 
     public function destroy(Property $property)
     {
-        abort_if($property->user_id !== Auth::id(), 403);
+        $user = Auth::user();
+
+        abort_if(
+            $user->role !== 'admin' && $property->user_id !== $user->id,
+            403
+        );
 
         $property->delete();
 
