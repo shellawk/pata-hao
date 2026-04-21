@@ -60,9 +60,10 @@ export default function UpdateProfileInformation({
                     <TextInput
                         id="email"
                         type="email"
-                        className="mt-1 block w-full"
+                        className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
                         value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        // onChange={(e) => setData('email', e.target.value)}
+                        disabled
                         required
                         autoComplete="username"
                     />
