@@ -75,4 +75,45 @@ class PropertyController extends Controller
 
         return back()->with('success', 'Property deleted successfully');
     }
+
+    public function update(Property $property, Request $request)
+    {
+        $user = Auth::user();
+
+        abort_if(
+            $user->role !== 'admin' && $property->user_id !== $user->id,
+            403
+        );
+
+        $request->validate([
+            'type' => 'required',
+            'location' => 'required',
+            'price' => 'required|numeric',
+            'size' => 'required|numeric',
+            'beds' => 'nullable|integer',
+            'baths' => 'nullable|integer',
+            'phone' => 'nullable|string',
+            'description' => 'nullable|string',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        $imagePaths = [];
+
+        $data = $request->only([
+            'type', 'location', 'price', 'size', 'beds', 'baths', 'phone', 'description'
+        ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('properties', 'public');
+                $imagePaths[] = '/storage/' . $path;
+            }
+            $data['images'] = $imagePaths;
+        }
+
+        $property->update($data);
+
+        return back()->with('success', 'Property updated successfully');
+    }
 }

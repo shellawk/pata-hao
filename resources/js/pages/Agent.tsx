@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 export default function Agent() {
   const { enquiries, properties, flash } = usePage().props as any;
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [editingProperty, setEditingProperty] = useState<any | null>(null);
 
   const [activeTab, setActiveTab] = useState("create");
   const [message, setMessage] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export default function Agent() {
     images: [] as File[],
   });
 
-  const createProperty = (e: any) => {
+  const submitProperty = (e: any) => {
     e.preventDefault();
 
     setLoading(true);
@@ -41,6 +42,23 @@ export default function Agent() {
       formData.append(`images[${i}]`, file);
     });
 
+    if (editingProperty) {
+      formData.append("_method", "PATCH");
+      router.post(route("properties.update", editingProperty.id), formData, {
+        preserveScroll: true,
+        onSuccess: () => {
+          reset();
+          setEditingProperty(null);
+          setMessage("Property updated successfully ✅");
+        },
+        onError: () => {
+          setError("Failed to update property ❌");
+        },
+        onFinish: () => setLoading(false),
+      });
+
+      return;
+    }
     router.post(route("properties.store"), formData, {
       preserveScroll: true,
       onSuccess: () => {
@@ -152,7 +170,7 @@ export default function Agent() {
         {activeTab === "create" && (
           <div className="bg-white p-4 rounded shadow">
 
-            <form onSubmit={createProperty} className="space-y-4">
+            <form onSubmit={submitProperty} className="space-y-4">
 
               {/* TOP ROW */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -264,7 +282,11 @@ export default function Agent() {
                   loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {loading ? "Processing..." : "Add Property"}
+                {loading
+              ? "Processing..."
+              : editingProperty
+              ? "Update Property"
+              : "Add Property"}
               </button>
 
             </form>
@@ -321,6 +343,28 @@ export default function Agent() {
 
                         {/* ACTIONS */}
                         <div className="flex justify-end pt-2">
+                          <button
+                            onClick={() => {
+                              setEditingProperty(p);
+
+                              setData({
+                                type: p.type,
+                                location: p.location,
+                                price: p.price,
+                                size: p.size,
+                                beds: p.beds,
+                                baths: p.baths,
+                                description: p.description || "",
+                                phone: p.phone || "",
+                                images: [],
+                              });
+
+                              setActiveTab("create");
+                            }}
+                            className="text-[11px] bg-yellow-500 text-white px-3 py-1 rounded hover:opacity-90 mr-2"
+                          >
+                            Edit
+                          </button>
                           <button
                             onClick={() => deleteProperty(p.id)}
                             disabled={deletingId === p.id}

@@ -106,6 +106,8 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])
         ->name('properties.destroy');
+    Route::patch('/properties/{property}', [PropertyController::class, 'update'])
+        ->name('properties.update');
 });
 
 require __DIR__.'/auth.php';
