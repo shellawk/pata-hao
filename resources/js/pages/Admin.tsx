@@ -4,9 +4,10 @@ import { usePage, router } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function Admin() {
-  const { users, properties, enquiries } = usePage().props as any;
+  const { users, properties, enquiries, flash } = usePage().props as any;
+
+  const [activeTab, setActiveTab] = useState("users");
   const [passwords, setPasswords] = useState<{ [key: number]: string }>({});
-  const { flash } = usePage().props as any;
 
   const deleteProperty = (id: number) => {
     if (confirm("Delete property?")) {
@@ -25,13 +26,15 @@ export default function Admin() {
   const updatePassword = (id: number) => {
     if (!passwords[id]) return;
 
-    router.patch(route("admin.users.update", id), {
-      password: passwords[id],
-    }, {
-      onSuccess: () => {
-        setPasswords({ ...passwords, [id]: "" });
+    router.patch(
+      route("admin.users.update", id),
+      { password: passwords[id] },
+      {
+        onSuccess: () => {
+          setPasswords({ ...passwords, [id]: "" });
+        },
       }
-    });
+    );
   };
 
   return (
@@ -39,27 +42,41 @@ export default function Admin() {
       <Navbar />
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
 
-        {/* FLASH MESSAGES */}
+        {/* FLASH */}
         {flash?.success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
             {flash.success}
           </div>
         )}
 
         {flash?.error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
             {flash.error}
           </div>
         )}
 
-        {/* ================= USERS ================= */}
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-3">Users</h2>
+        {/* ================= TABS ================= */}
+        <div className="flex gap-2 border-b pb-2">
+          {["users", "properties", "enquiries"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-t capitalize ${
+                activeTab === tab
+                  ? "bg-[#0a3d62] text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-          <div className="max-h-64 overflow-y-auto space-y-3 pr-2">
+        {/* ================= USERS ================= */}
+        {activeTab === "users" && (
+          <div className="bg-white p-4 rounded shadow space-y-3">
             {users.map((u: any) => (
               <div
                 key={u.id}
@@ -72,11 +89,11 @@ export default function Admin() {
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-2">
-                  {/* PASSWORD UPDATE */}
                   <input
                     type="password"
                     placeholder="New password"
                     className="border p-1 rounded text-sm"
+                    value={passwords[u.id] || ""}
                     onChange={(e) =>
                       setPasswords({
                         ...passwords,
@@ -92,7 +109,6 @@ export default function Admin() {
                     Update
                   </button>
 
-                  {/* DELETE USER */}
                   <button
                     onClick={() => deleteUser(u.id)}
                     className="bg-red-500 text-white px-2 py-1 rounded text-xs"
@@ -103,13 +119,11 @@ export default function Admin() {
               </div>
             ))}
           </div>
-        </div>
+        )}
 
         {/* ================= PROPERTIES ================= */}
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-3">All Properties</h2>
-
-          <div className="max-h-96 overflow-y-auto pr-2 grid md:grid-cols-2 gap-3">
+        {activeTab === "properties" && (
+          <div className="bg-white p-4 rounded shadow grid md:grid-cols-2 gap-3">
             {properties.map((p: any) => (
               <div key={p.id} className="border p-3 rounded">
                 <h3 className="font-semibold">{p.type}</h3>
@@ -125,16 +139,13 @@ export default function Admin() {
               </div>
             ))}
           </div>
-        </div>
+        )}
 
         {/* ================= ENQUIRIES ================= */}
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-3">All Enquiries</h2>
-
-          <div className="space-y-3 max-h-[28rem] overflow-y-auto space-y-3 pr-2">
+        {activeTab === "enquiries" && (
+          <div className="bg-white p-4 rounded shadow space-y-3">
             {enquiries.map((e: any) => (
               <div key={e.id} className="border p-3 rounded">
-
                 <div className="font-semibold">
                   {e.type} • {e.location}
                 </div>
@@ -143,20 +154,10 @@ export default function Admin() {
                   Budget: {e.min_price} - {e.max_price}
                 </div>
 
-                {/* ================= USER INFO ================= */}
                 <div className="mt-2 text-sm space-y-1">
-                  <p>
-                    <strong>Name:</strong> {e.user?.name}
-                  </p>
-
-                  {/* Only show if you actually store phone on user */}
-                  <p>
-                    <strong>Phone:</strong> {e.user?.phone || "N/A"}
-                  </p>
-
-                  <p>
-                    <strong>Email:</strong> {e.user?.email}
-                  </p>
+                  <p><strong>Name:</strong> {e.user?.name}</p>
+                  <p><strong>Phone:</strong> {e.user?.phone || "N/A"}</p>
+                  <p><strong>Email:</strong> {e.user?.email}</p>
 
                   {e.message && (
                     <p className="text-gray-600">
@@ -164,14 +165,12 @@ export default function Admin() {
                     </p>
                   )}
                 </div>
-
               </div>
             ))}
           </div>
-        </div>
-
+        )}
       </div>
-      
+
       <Footer />
     </>
   );

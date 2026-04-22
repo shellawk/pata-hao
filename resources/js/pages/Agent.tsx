@@ -1,11 +1,18 @@
 import Footer from "@/Components/Footer";
 import Navbar from "@/Components/Navbar";
 import { useForm, usePage, router } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 
 export default function Agent() {
-  const { enquiries, properties } = usePage().props as any;
+  const { enquiries, properties, flash } = usePage().props as any;
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const { data, setData, post, reset } = useForm({
+  const [activeTab, setActiveTab] = useState("create");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const { data, setData, reset } = useForm({
     type: "Apartment",
     location: "",
     price: "",
@@ -17,219 +24,318 @@ export default function Agent() {
     images: [] as File[],
   });
 
-    const createProperty = (e: any) => {
-        e.preventDefault();
+  const createProperty = (e: any) => {
+    e.preventDefault();
 
-        const formData = new FormData();
+    setLoading(true);
+    setMessage(null);
+    setError(null);
 
-        formData.append("type", data.type);
-        formData.append("location", data.location);
-        formData.append("price", data.price);
-        formData.append("size", data.size);
-        formData.append("beds", data.beds);
-        formData.append("baths", data.baths);
-        formData.append("phone", data.phone);
-        formData.append("description", data.description);
+    const formData = new FormData();
 
-        data.images.forEach((file, index) => {
-            formData.append(`images[${index}]`, file);
-        });
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "images") formData.append(key, value as string);
+    });
 
-        router.post(route("properties.store"), formData, {
-            preserveScroll: true,
-            onSuccess: () => reset(),
-            onError: (err) => console.error(err),
-        });
-    };
+    data.images.forEach((file, i) => {
+      formData.append(`images[${i}]`, file);
+    });
+
+    router.post(route("properties.store"), formData, {
+      preserveScroll: true,
+      onSuccess: () => {
+        reset();
+        setMessage("Property created successfully ✅");
+      },
+      onError: () => {
+        setError("Failed to create property ❌");
+      },
+      onFinish: () => setLoading(false),
+    });
+  };
 
   const deleteProperty = (id: number) => {
-    if (confirm("Delete this property?")) {
-      router.delete(route("properties.destroy", id));
-    }
+    if (!confirm("Delete this property?")) return;
+
+    setDeletingId(id);
+    setMessage(null);
+    setError(null);
+
+    router.delete(route("properties.destroy", id), {
+      onSuccess: () => setMessage("Property deleted successfully 🗑️"),
+      onError: () => setError("Failed to delete property ❌"),
+      onFinish: () => setDeletingId(null),
+    });
   };
 
   const assignProperty = (enquiryId: number, propertyId: number) => {
+    setLoading(true);
+    setMessage(null);
+    setError(null);
+
     router.post(route("agent.assign"), {
       enquiry_id: enquiryId,
       property_id: propertyId,
+    }, {
+      onSuccess: () => setMessage("Property assigned successfully ✅"),
+      onError: () => setError("Failed to assign property ❌"),
+      onFinish: () => setLoading(false),
     });
   };
+
+  useEffect(() => {
+    if (message || error) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+        setError(null);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message, error]);
 
   return (
     <>
       <Navbar />
 
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-
         <h1 className="text-2xl font-bold">Agent Dashboard</h1>
 
-        {/* ================= CREATE PROPERTY ================= */}
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-lg font-semibold mb-3">Add Property</h2>
+        {/* FLASH (SERVER) */}
+        {flash?.success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
+            {flash.success}
+          </div>
+        )}
 
-          <form onSubmit={createProperty} className="space-y-3">
+        {flash?.error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+            {flash.error}
+          </div>
+        )}
 
-            <select
-              value={data.type}
-              onChange={(e) => setData("type", e.target.value)}
-              className="w-full border p-2"
+        {/* LOCAL FEEDBACK */}
+        {message && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
+            {message}
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+            {error}
+          </div>
+        )}
+
+        {/* ================= TABS ================= */}
+        <div className="flex gap-2 border-b pb-2">
+          {[
+            { key: "create", label: "Add Property" },
+            { key: "properties", label: "My Properties" },
+            { key: "enquiries", label: "Enquiries" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2 rounded-t ${
+                activeTab === tab.key
+                  ? "bg-[#0a3d62] text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
             >
-              <option>Apartment</option>
-              <option>House</option>
-            </select>
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-            <input
-              placeholder="Location"
-              value={data.location}
-              onChange={(e) => setData("location", e.target.value)}
-              className="w-full border p-2"
-            />
+        {/* ================= CREATE ================= */}
+        {activeTab === "create" && (
+          <div className="bg-white p-4 rounded shadow">
+            <form onSubmit={createProperty} className="space-y-3">
 
-            <input
-              placeholder="Price"
-              value={data.price}
-              onChange={(e) => setData("price", e.target.value)}
-              className="w-full border p-2"
-            />
-            
-            <input
-                placeholder="Phone Number"
+              <select
+                value={data.type}
+                onChange={(e) => setData("type", e.target.value)}
+                className="w-full border p-2"
+              >
+                <option>Apartment</option>
+                <option>House</option>
+              </select>
+
+              <input
+                placeholder="Location"
+                value={data.location}
+                onChange={(e) => setData("location", e.target.value)}
+                className="w-full border p-2"
+              />
+
+              <input
+                placeholder="Price"
+                value={data.price}
+                onChange={(e) => setData("price", e.target.value)}
+                className="w-full border p-2"
+              />
+
+              <input
+                placeholder="Phone"
                 value={data.phone}
                 onChange={(e) => setData("phone", e.target.value)}
                 className="w-full border p-2"
-            />
-
-            <input
-              placeholder="Size"
-              value={data.size}
-              onChange={(e) => setData("size", e.target.value)}
-              className="w-full border p-2"
-            />
-
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                placeholder="Beds"
-                value={data.beds}
-                onChange={(e) => setData("beds", e.target.value)}
-                className="border p-2"
               />
 
               <input
-                placeholder="Baths"
-                value={data.baths}
-                onChange={(e) => setData("baths", e.target.value)}
-                className="border p-2"
+                placeholder="Size"
+                value={data.size}
+                onChange={(e) => setData("size", e.target.value)}
+                className="w-full border p-2"
               />
-            </div>
 
-            <textarea
-              placeholder="Description"
-              value={data.description}
-              onChange={(e) => setData("description", e.target.value)}
-              className="w-full border p-2"
-            />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  placeholder="Beds"
+                  value={data.beds}
+                  onChange={(e) => setData("beds", e.target.value)}
+                  className="border p-2"
+                />
 
-            <input
+                <input
+                  placeholder="Baths"
+                  value={data.baths}
+                  onChange={(e) => setData("baths", e.target.value)}
+                  className="border p-2"
+                />
+              </div>
+
+              <textarea
+                placeholder="Description"
+                value={data.description}
+                onChange={(e) => setData("description", e.target.value)}
+                className="w-full border p-2"
+              />
+
+              <input
                 type="file"
                 multiple
                 onChange={(e) => {
-                    if (!e.target.files) return;
-
-                    const newFiles = Array.from(e.target.files);
-
-                    setData("images", [...data.images, ...newFiles]);
-
-                    e.target.value = "";
+                  if (!e.target.files) return;
+                  setData("images", [
+                    ...data.images,
+                    ...Array.from(e.target.files),
+                  ]);
                 }}
                 className="w-full border p-2"
-            />
+              />
 
-            {data.images.length > 0 && (
-            <div className="grid grid-cols-4 gap-2">
-                {data.images.map((file, index) => (
-                <img
-                    key={index}
-                    src={URL.createObjectURL(file)}
-                    className="w-full h-20 object-cover rounded"
-                />
-                ))}
-            </div>
-            )}
+              {data.images.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {data.images.map((file, i) => (
+                    <img
+                      key={i}
+                      src={URL.createObjectURL(file)}
+                      className="h-20 object-cover rounded"
+                    />
+                  ))}
+                </div>
+              )}
 
-            <button className="bg-blue-600 text-white px-4 py-2 rounded">
-              Add Property
-            </button>
-          </form>
-        </div>
-
-        
+              <button
+                disabled={loading}
+                className={`px-4 py-2 rounded text-white ${
+                  loading ? "bg-gray-400" : "bg-blue-600"
+                }`}
+              >
+                {loading ? "Processing..." : "Add Property"}
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* ================= PROPERTIES ================= */}
-        <div>
-          <h2 className="text-lg font-semibold mb-2 mt-6">
-            Available Properties
-          </h2>
+        {activeTab === "properties" && (
+          <div className="bg-white p-4 rounded shadow">
 
-          <div className="max-h-96 overflow-y-auto pr-2 grid md:grid-cols-2 gap-3">
-            {properties.map((p: any) => (
-              <div key={p.id} className="bg-white p-4 rounded shadow border">
-                <h3 className="font-semibold">{p.type}</h3>
-                <p className="text-sm text-gray-600">{p.location}</p>
-                <p className="text-sm text-gray-600">{p.price}</p>
-
-                <button
-                  onClick={() => deleteProperty(p.id)}
-                  className="mt-2 text-xs px-2 py-1 bg-red-100 text-red-700 rounded"
-                >
-                  Delete
-                </button>
+            {properties.length === 0 ? (
+              <div className="text-center text-gray-500 py-10">
+                No properties yet. Add one from the "Add Property" tab.
               </div>
-            ))}
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {properties.map((p: any) => (
+                  <div
+                    key={p.id}
+                    className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
+                  >
+                    {/* IMAGE */}
+                    <div className="h-40 bg-gray-100">
+                      <img
+                        src={p.images?.[0] || "/placeholder.jpg"}
+                        alt={p.type}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* DETAILS */}
+                    <div className="p-3 space-y-1">
+                      <h3 className="font-semibold text-lg">
+                        {p.type || "Property"}
+                      </h3>
+
+                      <p className="text-sm text-gray-600">
+                        {p.location || "Unknown location"}
+                      </p>
+
+                      <p className="text-green-600 font-semibold">
+                        KES {Number(p.price).toLocaleString()}
+                      </p>
+
+                      <p className="text-xs text-gray-500">
+                        {p.size || "-"} sq ft • {p.beds || 0} beds • {p.baths || 0} baths
+                      </p>
+
+                      {/* ACTIONS */}
+                      <div className="flex justify-between items-center pt-2">                        
+                        <button
+                          onClick={() => deleteProperty(p.id)}
+                          disabled={deletingId === p.id}
+                          className="text-xs bg-red-500 text-white px-3 py-1 rounded"
+                        >
+                          {deletingId === p.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* ================= ENQUIRIES ================= */}
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Incoming Enquiries</h2>
-
-          <div className="max-h-[28rem] overflow-y-auto space-y-3 pr-2">
+        {activeTab === "enquiries" && (
+          <div className="bg-white p-4 rounded shadow space-y-3">
             {enquiries.map((e: any) => (
-              <div key={e.id} className="bg-white p-4 rounded shadow border">
+              <div key={e.id} className="border p-3 rounded">
 
-                <div className="flex justify-between">
-                  <h3 className="font-semibold">
-                    {e.type} • {e.location}
-                  </h3>
+                <div className="font-semibold">
+                  {e.type} • {e.location}
                 </div>
 
-                <div className="mt-2 text-sm space-y-1 text-gray-700">
+                <div className="text-sm text-gray-600 mt-1">
+                  Budget: {e.min_price} - {e.max_price}
+                </div>
 
-                  <p>
-                    <strong>Name:</strong> {e.user?.name}
-                  </p>
-
-                  <p>
-                    <strong>Phone:</strong> {e.user?.phone ?? "N/A"}
-                  </p>
-
-                  <p className="text-gray-600">
-                    <strong>Budget:</strong> {e.min_price} - {e.max_price}
-                  </p>
-
-                  {e.beds && <p>Beds: {e.beds}</p>}
-                  {e.baths && <p>Baths: {e.baths}</p>}
+                <div className="mt-2 text-sm space-y-1">
+                  <p><strong>Name:</strong> {e.user?.name}</p>
+                  <p><strong>Phone:</strong> {e.user?.phone || "N/A"}</p>
 
                   {e.message && (
-                    <p className="text-gray-600">
-                      <strong>Message:</strong> {e.message}
-                    </p>
+                    <p><strong>Message:</strong> {e.message}</p>
                   )}
                 </div>
               </div>
             ))}
           </div>
-        </div>
-
+        )}
       </div>
 
       <Footer />
