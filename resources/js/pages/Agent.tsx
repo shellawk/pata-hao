@@ -151,101 +151,122 @@ export default function Agent() {
         {/* ================= CREATE ================= */}
         {activeTab === "create" && (
           <div className="bg-white p-4 rounded shadow">
-            <form onSubmit={createProperty} className="space-y-3">
 
-              <select
-                value={data.type}
-                onChange={(e) => setData("type", e.target.value)}
-                className="w-full border p-2"
-              >
-                <option>Apartment</option>
-                <option>House</option>
-              </select>
+            <form onSubmit={createProperty} className="space-y-4">
 
-              <input
-                placeholder="Location"
-                value={data.location}
-                onChange={(e) => setData("location", e.target.value)}
-                className="w-full border p-2"
-              />
+              {/* TOP ROW */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-              <input
-                placeholder="Price"
-                value={data.price}
-                onChange={(e) => setData("price", e.target.value)}
-                className="w-full border p-2"
-              />
+                <select
+                  value={data.type}
+                  onChange={(e) => setData("type", e.target.value)}
+                  className="border p-2 rounded w-full"
+                >
+                  <option>Apartment</option>
+                  <option>House</option>
+                </select>
 
-              <input
-                placeholder="Phone"
-                value={data.phone}
-                onChange={(e) => setData("phone", e.target.value)}
-                className="w-full border p-2"
-              />
+                <input
+                  placeholder="Phone"
+                  value={data.phone}
+                  onChange={(e) => setData("phone", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
 
-              <input
-                placeholder="Size"
-                value={data.size}
-                onChange={(e) => setData("size", e.target.value)}
-                className="w-full border p-2"
-              />
+              </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* LOCATION + PRICE */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                <input
+                  placeholder="Location"
+                  value={data.location}
+                  onChange={(e) => setData("location", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+
+                <input
+                  placeholder="Price"
+                  value={data.price}
+                  onChange={(e) => setData("price", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+
+              </div>
+
+              {/* SIZE + BED/BATH */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                <input
+                  placeholder="Size (sq ft)"
+                  value={data.size}
+                  onChange={(e) => setData("size", e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+
                 <input
                   placeholder="Beds"
                   value={data.beds}
                   onChange={(e) => setData("beds", e.target.value)}
-                  className="border p-2"
+                  className="border p-2 rounded w-full"
                 />
 
                 <input
                   placeholder="Baths"
                   value={data.baths}
                   onChange={(e) => setData("baths", e.target.value)}
-                  className="border p-2"
+                  className="border p-2 rounded w-full"
                 />
+
               </div>
 
+              {/* DESCRIPTION */}
               <textarea
                 placeholder="Description"
                 value={data.description}
                 onChange={(e) => setData("description", e.target.value)}
-                className="w-full border p-2"
+                className="w-full border p-2 rounded min-h-[100px]"
               />
 
-              <input
-                type="file"
-                multiple
-                onChange={(e) => {
-                  if (!e.target.files) return;
-                  setData("images", [
-                    ...data.images,
-                    ...Array.from(e.target.files),
-                  ]);
-                }}
-                className="w-full border p-2"
-              />
+              {/* FILE UPLOAD */}
+              <div className="border rounded p-3">
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => {
+                    if (!e.target.files) return;
+                    setData("images", [
+                      ...data.images,
+                      ...Array.from(e.target.files),
+                    ]);
+                  }}
+                  className="w-full"
+                />
 
-              {data.images.length > 0 && (
-                <div className="grid grid-cols-4 gap-2">
-                  {data.images.map((file, i) => (
-                    <img
-                      key={i}
-                      src={URL.createObjectURL(file)}
-                      className="h-20 object-cover rounded"
-                    />
-                  ))}
-                </div>
-              )}
+                {/* PREVIEW */}
+                {data.images.length > 0 && (
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-3">
+                    {data.images.map((file, i) => (
+                      <img
+                        key={i}
+                        src={URL.createObjectURL(file)}
+                        className="h-16 w-full object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
 
+              {/* SUBMIT */}
               <button
                 disabled={loading}
-                className={`px-4 py-2 rounded text-white ${
-                  loading ? "bg-gray-400" : "bg-blue-600"
+                className={`w-full md:w-auto px-6 py-2 rounded text-white transition ${
+                  loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {loading ? "Processing..." : "Add Property"}
               </button>
+
             </form>
           </div>
         )}
@@ -259,52 +280,61 @@ export default function Agent() {
                 No properties yet. Add one from the "Add Property" tab.
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {properties.map((p: any) => (
-                  <div
-                    key={p.id}
-                    className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
-                  >
-                    {/* IMAGE */}
-                    <div className="h-40 bg-gray-100">
-                      <img
-                        src={p.images?.[0] || "/placeholder.jpg"}
-                        alt={p.type}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+              <div className="pr-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
-                    {/* DETAILS */}
-                    <div className="p-3 space-y-1">
-                      <h3 className="font-semibold text-lg">
-                        {p.type || "Property"}
-                      </h3>
+                  {properties.map((p: any) => (
+                    <div
+                      key={p.id}
+                      className="flex flex-col border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition bg-white"
+                    >
 
-                      <p className="text-sm text-gray-600">
-                        {p.location || "Unknown location"}
-                      </p>
+                      {/* IMAGE */}
+                      <div className="h-32 bg-gray-100">
+                        <img
+                          src={p.images?.[0] || "/placeholder.jpg"}
+                          alt={p.type}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                      <p className="text-green-600 font-semibold">
-                        KES {Number(p.price).toLocaleString()}
-                      </p>
+                      {/* DETAILS */}
+                      <div className="p-3 flex flex-col justify-between flex-1 space-y-1">
 
-                      <p className="text-xs text-gray-500">
-                        {p.size || "-"} sq ft • {p.beds || 0} beds • {p.baths || 0} baths
-                      </p>
+                        <div>
+                          <h3 className="font-semibold text-sm truncate">
+                            {p.type || "Property"}
+                          </h3>
 
-                      {/* ACTIONS */}
-                      <div className="flex justify-between items-center pt-2">                        
-                        <button
-                          onClick={() => deleteProperty(p.id)}
-                          disabled={deletingId === p.id}
-                          className="text-xs bg-red-500 text-white px-3 py-1 rounded"
-                        >
-                          {deletingId === p.id ? "Deleting..." : "Delete"}
-                        </button>
+                          <p className="text-xs text-gray-500 truncate">
+                            {p.location || "Unknown location"}
+                          </p>
+
+                          <p className="text-green-600 font-semibold text-sm">
+                            KES {Number(p.price).toLocaleString()}
+                          </p>
+
+                          <p className="text-[11px] text-gray-500">
+                            {p.size || "-"} sq ft • {p.beds || 0} beds • {p.baths || 0} baths
+                          </p>
+                        </div>
+
+                        {/* ACTIONS */}
+                        <div className="flex justify-end pt-2">
+                          <button
+                            onClick={() => deleteProperty(p.id)}
+                            disabled={deletingId === p.id}
+                            className="text-[11px] bg-red-500 text-white px-3 py-1 rounded hover:opacity-90"
+                          >
+                            {deletingId === p.id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+
+                </div>
               </div>
             )}
           </div>
