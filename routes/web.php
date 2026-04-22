@@ -3,18 +3,31 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\RecentlyViewedPropertyController;
 use App\Models\Enquiry;
 use App\Models\Property;
+use App\Models\RecentlyViewedProperty;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
 Route::get('/', function () {
+
+    $recent = [];
+
+    if (auth()->check()) {
+        $recent = RecentlyViewedProperty::with('property')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->first()?->property;
+    }
+
     return Inertia::render('Home', [
-        'properties' => \App\Models\Property::all()
-    ]);
-})->name('home');
+        'properties' => \App\Models\Property::all(),
+        'recent' => $recent,
+        ]);
+    }) ->name('home');
 
 Route::get('/enquiries', function () {
     return Inertia::render('Enquiries', [
@@ -67,6 +80,8 @@ Route::get('/about', function () {
 Route::get('/contact', function () {
     return Inertia::render('Contact');
 })->name('contact');
+
+Route::post('/recently-viewed', [RecentlyViewedPropertyController::class, 'store']);
 
 
 Route::middleware('auth')->group(function () {

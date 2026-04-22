@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Head } from "@inertiajs/react";
+import { useEffect, useState } from "react";
+import { Head, router, usePage } from "@inertiajs/react";
 import Navbar from "@/Components/Navbar";
 import PropertyCard from "@/Components/PropertyCard";
 import Footer from "@/Components/Footer";
@@ -17,42 +17,39 @@ interface Property {
   phone?: string;
 }
 
-export default function Home({ properties }: { properties: Property[] }) {
+export default function Home({
+  properties,
+  recent = null,
+}: {
+  properties: Property[];
+  recent: Property | null;
+}) {
+  const { auth } = usePage().props as any;
+  const user = auth?.user;
   const [filtered, setFiltered] = useState(properties);
 
   const [filters, setFilters] = useState({
-  type: "",
-  location: "",
-  minSize: "",
-  maxSize: "",
-  minPrice: "",
-  maxPrice: "",
-  beds: "",
-  baths: "",
-});
+    type: "",
+    location: "",
+    minSize: "",
+    maxSize: "",
+    minPrice: "",
+    maxPrice: "",
+    beds: "",
+    baths: "",
+  });
 
   const handleFilter = () => {
     const result = properties.filter((p) => {
       return (
-        // TYPE
         (!filters.type || p.type === filters.type) &&
-
-        // LOCATION
         (!filters.location ||
           p.location.toLowerCase().includes(filters.location.toLowerCase())) &&
-
-        // SIZE RANGE (FIXED)
         (!filters.minSize || p.size >= Number(filters.minSize)) &&
         (!filters.maxSize || p.size <= Number(filters.maxSize)) &&
-
-        // PRICE RANGE
         (!filters.minPrice || p.price >= Number(filters.minPrice)) &&
         (!filters.maxPrice || p.price <= Number(filters.maxPrice)) &&
-
-        // BEDS
         (!filters.beds || p.beds === Number(filters.beds)) &&
-
-        // BATHS
         (!filters.baths || p.baths === Number(filters.baths))
       );
     });
@@ -63,14 +60,24 @@ export default function Home({ properties }: { properties: Property[] }) {
   const [selected, setSelected] = useState<Property | null>(null);
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (selected) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [selected]);
+
   return (
     <>
       <Head title="Home" />
-
       <Navbar />
 
       <div className="max-w-6xl mx-auto p-4">
-        
         {/* FILTER BOX */}
         <div className="bg-white rounded-[14px] p-4 shadow-[0_4px_12px_rgba(0,0,0,0.06)] mb-5">
           <h3 className="font-semibold mb-3">Find Property</h3>
@@ -156,13 +163,31 @@ export default function Home({ properties }: { properties: Property[] }) {
           <button
             onClick={handleFilter}
             className="mt-3 bg-[#0a3d62] text-white px-4 py-2 rounded-lg hover:opacity-90 transition"
-            style={{color: "white"}}
           >
             Search
           </button>
         </div>
 
-        {/* PROPERTY GRID */}
+        {/* RECENTLY VIEWED (IMPROVED UI) */}
+        {user && recent && (
+          <div className="mb-8">
+            <h2 className="text-lg font-bold mb-3">Recently Viewed</h2>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
+              <div
+                className="cursor-pointer max-w-md"
+                onClick={() => {
+                  setSelected(recent);
+                  setActiveImage(recent.images?.[0] || null);
+                }}
+              >
+                <PropertyCard property={recent} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {filtered.map((p) => (
             <div
@@ -170,6 +195,12 @@ export default function Home({ properties }: { properties: Property[] }) {
               onClick={() => {
                 setSelected(p);
                 setActiveImage(p.images?.[0] || null);
+
+                if (auth?.user) {
+                  router.post("/recently-viewed", {
+                    property_id: p.id,
+                  });
+                }
               }}
               className="cursor-pointer"
             >
@@ -178,17 +209,21 @@ export default function Home({ properties }: { properties: Property[] }) {
           ))}
         </div>
       </div>
+
+      {/* MODAL */}
       {selected && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-start justify-center z-50 p-3 pt-[80px]"
-          onClick={() => setSelected(null)} style ={{backgroundColor: "rgba(0, 0, 0, 0.7)"}}
+          className="fixed inset-0 bg-black/70 flex items-start justify-center z-[9999] p-3 pt-[80px]"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelected(null);
+            }
+          }}
         >
           <div
-            className="bg-white w-full max-w-2xl rounded-xl shadow-xl overflow-hidden max-h-[85vh] overflow-y-auto opacity-100"
+            className="bg-white w-full max-w-2xl rounded-xl shadow-xl overflow-hidden max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
-            style={{backgroundColor: "white"}}
           >
-            {/* CLOSE BUTTON */}
             <div className="sticky top-0 bg-white p-3 flex justify-end">
               <button
                 onClick={() => setSelected(null)}
@@ -198,12 +233,13 @@ export default function Home({ properties }: { properties: Property[] }) {
               </button>
             </div>
 
-            {/* IMAGE */}
-            <img
-              src={activeImage || selected.images?.[0]}
-            />
+            <div className="w-full h-[300px] bg-gray-100 flex items-center justify-center">
+              <img
+                src={activeImage || selected.images?.[0]}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-            {/* GALLERY */}
             <div className="flex gap-2 p-3 flex-wrap">
               {selected.images?.map((img, i) => (
                 <img
@@ -211,13 +247,14 @@ export default function Home({ properties }: { properties: Property[] }) {
                   src={img}
                   onClick={() => setActiveImage(img)}
                   className={`w-20 h-16 object-cover rounded cursor-pointer border-2 ${
-                    activeImage === img ? "border-[#0a3d62]" : "border-transparent"
+                    activeImage === img
+                      ? "border-[#0a3d62]"
+                      : "border-transparent"
                   }`}
                 />
               ))}
             </div>
 
-            {/* DETAILS */}
             <div className="p-4 space-y-2">
               <h2 className="text-lg font-bold">
                 {selected.type} - {selected.location}
@@ -234,7 +271,8 @@ export default function Home({ properties }: { properties: Property[] }) {
               <p className="text-gray-600">{selected.description}</p>
 
               <div className="pt-2 border-t text-sm">
-                <span className="font-semibold">Agent:</span> {selected.phone}
+                <span className="font-semibold">Agent:</span>{" "}
+                {selected.phone}
               </div>
             </div>
           </div>
