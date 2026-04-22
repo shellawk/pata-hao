@@ -34,7 +34,7 @@ class PropertyController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('properties', 'public');
-                $imagePaths[] = '/storage/' . $path; // IMPORTANT FIX
+                $imagePaths[] = '/storage/' . $path;
             }
         }
 
@@ -73,6 +73,6 @@ class PropertyController extends Controller
 
         $property->delete();
 
-        return back();
+        return back()->with('success', 'Property deleted successfully');
     }
 }

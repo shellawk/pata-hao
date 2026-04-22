@@ -43,9 +43,6 @@ Route::post('/enquiries', [EnquiryController::class, 'store'])
     ->middleware('auth')
     ->name('enquiries.store');
 
-// Route::get('/agent', function () {
-//     return Inertia::render('Agent');
-// })->middleware(['auth'])->name('agent');
 
 Route::get('/agent', function () {
     return Inertia::render('Agent', [
@@ -71,6 +68,15 @@ Route::get('/admin', function () {
         'enquiries' => Enquiry::with('user')->latest()->get(),
     ]);
 })->middleware(['auth'])->name('admin');
+
+// =====================
+// ADMIN USER MANAGEMENT
+// =====================
+Route::delete('/admin/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])
+    ->name('admin.users.destroy');
+
+Route::patch('/admin/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'update'])
+    ->name('admin.users.update');
 
 
 Route::get('/about', function () {
